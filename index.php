@@ -24,5 +24,9 @@ switch($method){
             }
         }
         echo json_encode(["status" => "success", "data" => $rows]);
+    break;
+    
+    default:
+        echo json_encode(["status" => "error", "message" => "Unsupported method"]);
         break;
 }

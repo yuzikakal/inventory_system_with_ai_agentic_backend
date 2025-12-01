@@ -25,7 +25,7 @@ switch($method){
         }
         
         echo json_encode(["status" => "success", "data" => $rows]);
-        break;
+    break;
 
     case "POST":
         $username = $conn->real_escape_string($_POST['username']);
@@ -48,5 +48,9 @@ switch($method){
         } else {
             echo json_encode(["status" => "error", "message" => "Invalid username or password"]);
         }
+    break;
+    
+    default:
+        echo json_encode(["status" => "error", "message" => "Unsupported method"]);
         break;
 }
