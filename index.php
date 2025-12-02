@@ -25,6 +25,67 @@ switch($method){
         }
         echo json_encode(["status" => "success", "data" => $rows]);
     break;
+
+    case "POST":
+        $action = $conn->real_escape_string($_POST["action"]);
+
+        if ($action == "create"){
+            $nameitem = $conn->real_escape_string($_POST["name"]);
+            $stock = $conn->real_escape_string($_POST["stock"]);
+            $price = $conn->real_escape_string($_POST["price"]);
+            $created_by = $conn->real_escape_string($_POST["created_by"]);
+
+            $sql = "INSERT INTO inventory (name, stock, price, created_by) VALUES ('$nameitem', '$stock', '$price', '$created_by')";
+            $result = mysqli_query($conn, $sql);
+
+            if ($result){
+                echo json_encode(["status" => "success", "data" => ["nameitem" => $nameitem, "created_by" => $created_by]]);
+            } else {
+                echo json_encode(["status" => "error", "message" => $conn->error]);
+            }
+
+        } else {
+            echo json_encode(["status" => "error", "message" => $conn->error]);
+        }
+    break;
+
+    case "PUT":        
+        $id = $conn->real_escape_string($_POST['id']);
+
+        if (isset($id)){
+            $nameitem = $conn->real_escape_string($_POST["name"]);
+            $stock = $conn->real_escape_string($_POST["stock"]);
+            $price = $conn->real_escape_string($_POST["price"]);
+            $created_by = $conn->real_escape_string($_POST["created_by"]);
+
+            $result = mysqli_query($conn, "UPDATE inventory SET name = '$nameitem', stock = '$stock', price = '$price', created_by = '$created_by' WHERE ID = '$id'");
+
+            if ($result){
+                echo json_encode(["status" => "success", "data" => ["nameitem" => $id, "created_by" => $created_by]]);
+            } else {
+                echo json_encode(["status" => "error", "message" => $conn->error]);
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "$id"]);
+        }
+
+    break;
+
+    case "DELETE":
+        $id = $conn->real_escape_string($_POST['id']);
+
+        if (isset($id)){
+            $result = mysqli_query($conn, "DELETE FROM inventory WHERE ID = '$id'");
+
+            if ($result){
+                echo json_encode(["status" => "success", "data" => ["id" => $id]]);
+            } else {
+                echo json_encode(["status" => "error", "message" => $conn->error]);
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "ID not provided"]);
+        }
+    break;
     
     default:
         echo json_encode(["status" => "error", "message" => "Unsupported method"]);
