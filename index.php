@@ -72,13 +72,22 @@ switch($method){
     break;
 
     case "DELETE":
-        $id = $conn->real_escape_string($_POST['id']);
+        $token = $conn->real_escape_string($_GET['token']);
+        $id = $conn->real_escape_string($_GET['id']);
+
+        $sql = "SELECT ID, password, username, isAdmin FROM account WHERE session_token = '$token'";
+        $result = mysqli_query($conn, $sql);
+        
+        if (!$result || $result->num_rows === 0) {
+            echo json_encode(["status" => "error", "message" => "Invalid token"]);
+            break;
+        }
 
         if (isset($id)){
             $result = mysqli_query($conn, "DELETE FROM inventory WHERE ID = '$id'");
 
             if ($result){
-                echo json_encode(["status" => "success", "data" => ["id" => $id]]);
+                echo json_encode(["status" => "success", "data" => ["id" => $id]]); // Include action in response
             } else {
                 echo json_encode(["status" => "error", "message" => $conn->error]);
             }
