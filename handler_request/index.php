@@ -47,7 +47,7 @@ switch($method){
 
             $results = [];
             foreach ($queries as $query) {
-                $safeQuery = $conn->real_escape_string($query);
+                $safeQuery = $query;
                 $result = mysqli_query($conn, $safeQuery);
 
                 if ($result) {
@@ -87,8 +87,6 @@ switch($method){
             echo json_encode(["status" => "error", "message" => "Unsupported action"]);
         }
     break;
-
-
 
     case "PUT":        
         $id = $conn->real_escape_string($_POST['id']);
