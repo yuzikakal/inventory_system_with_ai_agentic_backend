@@ -15,6 +15,10 @@ if ($method === 'POST' && isset($_POST['_method'])) {
 switch($method){
     case "GET":
         $sql = "SELECT * FROM inventory";
+        $user = $conn->real_escape_string($_GET["user"]);
+        if ($user){
+            $sql = "SELECT * FROM inventory WHERE created_by = '$user'";
+        }
         $result = mysqli_query($conn, $sql);
         $rows = [];
         
