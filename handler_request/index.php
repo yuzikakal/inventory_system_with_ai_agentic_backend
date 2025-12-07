@@ -24,49 +24,59 @@ switch($method){
             $token = $conn->real_escape_string($_POST["token"]);
 
             // Validasi token
-            $searchUserByToken = "SELECT username, session_token FROM account WHERE session_token = '$token'";
+            $searchUserByToken = "SELECT username FROM account WHERE session_token = '$token'";
             $isValidToken = mysqli_query($conn, $searchUserByToken);
             if (!$isValidToken || mysqli_num_rows($isValidToken) == 0) {
                 echo json_encode(["status" => "error", "message" => "not valid token"]);
                 exit;
             }
-            $dataFromToken = mysqli_fetch_assoc($isValidToken);
-            $username = $dataFromToken["username"];
+            $username = mysqli_fetch_assoc($isValidToken)["username"];
 
-            // Split multiple query berdasarkan ;
+            // Split query
             $queries = array_filter(array_map('trim', explode(";", $sql_script_raw)));
-            // Simpan ke history (gabungan semua query jadi satu string)
+
+            // Simpan ke history (selalu simpan walau kosong/invalid)
             $sql_formatted = $conn->real_escape_string($sql_script_raw);
             $sqlInsertHistory = "INSERT INTO history_chat (request, response, sql_script, created_by) 
                                 VALUES ('$request', '$response', '$sql_formatted', '$username')";
-            $insertToHistory = mysqli_query($conn, $sqlInsertHistory);
-            if (!$insertToHistory) {
-                echo json_encode(["status" => "error", "message" => $conn->error]);
-                exit;
+            mysqli_query($conn, $sqlInsertHistory);
+
+            // Handle jika sql_script kosong
+            if (empty($queries)) {
+                echo json_encode([
+                    "status" => "success",
+                    "data" => [
+                        "request" => $request,
+                        "created_by" => $username,
+                        "sql_script" => [],
+                        "results" => []
+                    ]
+                ]);
+                return;
             }
 
+            // Jalankan query satu-satu
             $results = [];
             foreach ($queries as $query) {
-                $safeQuery = $query;
-                $result = mysqli_query($conn, $safeQuery);
+                $result = mysqli_query($conn, $query);
 
-                if ($result) {
-                    if ($result instanceof mysqli_result) {
-                        $rows = [];
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            $rows[] = $row;
-                        }
-                        $results[] = [
-                            "query" => $query,
-                            "rows" => $rows
-                        ];
-                    } else {
-                        $results[] = [
-                            "query" => $query,
-                            "affected_rows" => mysqli_affected_rows($conn)
-                        ];
+                if ($result instanceof mysqli_result) {
+                    $rows = [];
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $rows[] = $row;
                     }
-                } else {
+                    $results[] = [
+                        "query" => $query,
+                        "rows" => $rows
+                    ];
+                } 
+                else if ($result === true) {
+                    $results[] = [
+                        "query" => $query,
+                        "affected_rows" => mysqli_affected_rows($conn)
+                    ];
+                } 
+                else {
                     $results[] = [
                         "query" => $query,
                         "error" => $conn->error
@@ -83,9 +93,8 @@ switch($method){
                     "results" => $results
                 ]
             ]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Unsupported action"]);
         }
+
     break;
 
     default:

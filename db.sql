@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 05, 2025 at 04:25 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Dec 07, 2025 at 09:14 AM
+-- Server version: 12.0.2-MariaDB
+-- PHP Version: 8.4.15
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -35,16 +35,14 @@ CREATE TABLE `account` (
   `isAdmin` enum('YES','NO') NOT NULL,
   `session_token` varchar(255) DEFAULT NULL,
   `session_expiry` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Dumping data for table `account`
 --
 
 INSERT INTO `account` (`ID`, `created_at`, `username`, `password`, `isAdmin`, `session_token`, `session_expiry`) VALUES
-(1, '2025-12-01 05:16:46', 'hylmi', '$2a$12$aMkBUAVjtwfI46Us13Jx0.cNcJVa5ri0MaUFWt97U5fi4yupNBlS2', 'YES', 'e507a1328ef4026ee0b76045f2c02464cea7c0db19fd1ffb6966783e5427e5f7', '2025-12-06 18:51:32'),
-(2, '2025-12-01 14:49:20', 'test', '$2y$12$Sg50YvG6VnAeNp2dmgoujeP3iOAeqHfSyH9b2GzVsF.kALL81egK2', 'YES', 'd6b2d9dfc680bb58acb796a2797b489c2a244d96156d2161ad6b7532ab4a5314', '2025-12-06 08:57:07'),
-(3, '2025-12-02 01:17:20', 'akuruoaklah', '$2y$12$0/zkk9Vs1OZaQWoeLLFhIuP4aAULm1wyNHfKu7x3j/fmlYyXQSd.K', 'YES', NULL, NULL);
+(1, '2025-12-07 05:43:03', 'admin', '$2a$12$dK1/zUpCEC8Y/C7Kw09iAuVgBlvq2dmDi.fvxGpuIN0FOL3SX6cIy', 'YES', 'db25687d4194fad32afdd7ed9d218775f360ad85d38f5785ee798671a75786cc', '2025-12-08 12:43:24');
 
 -- --------------------------------------------------------
 
@@ -56,17 +54,10 @@ CREATE TABLE `history_chat` (
   `ID` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `request` varchar(255) NOT NULL,
-  `response` varchar(255) NOT NULL,
-  `sql_script` varchar(255) NOT NULL,
+  `response` longtext NOT NULL,
+  `sql_script` longtext NOT NULL,
   `created_by` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Dumping data for table `history_chat`
---
-
-INSERT INTO `history_chat` (`ID`, `created_at`, `request`, `response`, `sql_script`, `created_by`) VALUES
-(47, '2025-12-05 14:41:12', 'coba baca tabel itu dan tambah produk mekanikal keyboard itu 30 lagi', 'Memperbarui kolom \'stock\' untuk produk \'Mechanical Keyboard\' di tabel \'inventory\' dengan menambahkan 30 unit ke stok saat ini.', 'UPDATE inventory SET stock = stock + 30 WHERE name = \'Mechanical Keyboard\';', 'hylmi');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- --------------------------------------------------------
 
@@ -81,21 +72,7 @@ CREATE TABLE `inventory` (
   `stock` int(50) NOT NULL,
   `price` double(20,2) NOT NULL,
   `created_by` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Dumping data for table `inventory`
---
-
-INSERT INTO `inventory` (`ID`, `created_at`, `name`, `stock`, `price`, `created_by`) VALUES
-(35, '2025-12-05 14:18:45', 'Mechanical Keyboard', 30, 1200000.00, 'hylmi'),
-(36, '2025-12-05 14:18:45', 'Wireless Mouse Logitech', 10, 500000.00, 'hylmi'),
-(42, '2025-12-05 14:18:45', 'Portable Power Bank 20000mAh', 5, 350000.00, 'hylmi'),
-(43, '2025-12-05 14:18:45', 'USB-C Cable 2m', 50, 50000.00, 'hylmi'),
-(58, '2025-12-05 14:18:45', 'Wireless Charger Pad', 0, 400000.00, 'hylmi'),
-(59, '2025-12-05 14:18:45', 'Bluetooth Speaker Portable', 10, 250000.00, 'hylmi'),
-(62, '2025-12-05 14:18:45', 'Printer Laser Mono', 160, 3000000.00, 'hylmi'),
-(67, '2025-12-05 14:18:45', 'Fitness Tracker Xiaomi', 0, 450000.00, 'hylmi');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -127,19 +104,19 @@ ALTER TABLE `inventory`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `history_chat`
 --
 ALTER TABLE `history_chat`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
