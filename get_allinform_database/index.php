@@ -25,24 +25,39 @@ switch($method){
 
             $tables = [];
             $nametables = [];
+            $columns = [];
+
             if ($result) {
                 while ($row = mysqli_fetch_array($result)) {
-                    $tables[] = $row[0]; // kolom pertama berisi nama tabel
                     $nametables[] = $row[0];
                 }
 
-                for ($i = 0; $i < count($tables); $i++) {
-                    $sql = "SELECT * FROM " . $tables[$i];
-                    $result = $conn->query($sql);
-                    $rows = [];
-                    while ($row = $result->fetch_assoc()) {
-                        $rows[] = $row;
+                // Ambil data tiap tabel
+                foreach ($nametables as $tableName) {
+
+                    // 1. Ambil full columns
+                    $colQuery = "SHOW FULL COLUMNS FROM `$tableName`";
+                    $colResult = mysqli_query($conn, $colQuery);
+                    $colRows = [];
+                    while ($c = $colResult->fetch_assoc()) {
+                        $colRows[] = $c;
                     }
-                    $tables[$i] = $rows;
+                    $columns[$tableName] = $colRows;
+
+                    // 2. Ambil data tabel
+                    $dataQuery = "SELECT * FROM `$tableName`";
+                    $dataResult = mysqli_query($conn, $dataQuery);
+                    $dataRows = [];
+                    while ($r = $dataResult->fetch_assoc()) {
+                        $dataRows[] = $r;
+                    }
+                    $tables[] = $dataRows;
                 }
+
                 echo json_encode([
                     "status" => "success",
                     "name_tables" => $nametables,
+                    "columns" => $columns,
                     "data" => $tables
                 ]);
             } else {
@@ -51,8 +66,11 @@ switch($method){
                     "message" => $conn->error
                 ]);
             }
-        } else if ($type == "history_chat" && $isValidToken) {
-            $result = mysqli_query($conn, "SELECT * FROM history_chat");
+        }
+
+        else if ($type == "history_chat" && $isValidToken) {
+            $username = mysqli_fetch_array(mysqli_query($conn, "SELECT username FROM account WHERE session_token = '$token'"))["username"];
+            $result = mysqli_query($conn, "SELECT * FROM history_chat WHERE created_by = '$username'");
 
             $rows = [];
             if ($result) {
@@ -70,14 +88,13 @@ switch($method){
                 ]);
             }
         }
-        
+
         else {
             echo json_encode([
                 "status" => "error",
                 "message" => "Invalid type or token"
             ]);
         }
-
     break;
     
     default:

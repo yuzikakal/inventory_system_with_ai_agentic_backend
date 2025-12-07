@@ -18,7 +18,7 @@ switch($method){
         $password = $conn->real_escape_string($_POST['password']);
 
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
-        $sql = "INSERT INTO account (username, password) VALUES ('$username', '$hashedPassword')";
+        $sql = "INSERT INTO account (username, password, isAdmin) VALUES ('$username', '$hashedPassword', 'NO')";
         if (mysqli_query($conn, $sql)) {
             $id = mysqli_insert_id($conn);
             echo json_encode(["status" => "success", "data" => ["ID" => $id, "username" => $username]]);
